@@ -28,9 +28,9 @@ local managers = {
 local defaultType = angular.type
 local noErrorFoundMsg = "No error found"
 
-local function row_has_error(row, projectType)
+local function has_error(row, projectType)
     projectType = projectType or defaultType
-    return managers[projectType].row_has_error(row)
+    return managers[projectType].has_error(row)
 end
 
 local function has_failed_statement(row, projectType)
@@ -81,7 +81,7 @@ local function go_to_previous_error_from_current_cursor_position(build_last_fail
     local content = api.nvim_buf_get_lines(buffer.current_buffer, build_last_failed_statement_row, lastLine, false)
 
     for _, row in table_util.rpairs(content) do
-        if row_has_error(row) then
+        if has_error(row) then
             file.open(get_file_path(row))
             return true
         end
@@ -96,7 +96,7 @@ local function go_to_previous_error_from_last_buffer_line(build_last_failed_stat
         false)
 
     for _, row in table_util.rpairs(content) do
-        if row_has_error(row) then
+        if has_error(row) then
             file.open(get_file_path(row))
             return true
         end
@@ -134,7 +134,7 @@ local function go_to_first_error_from_last_failed_statement()
         false)
 
     for _, row in ipairs(content) do
-        if row_has_error(row) then
+        if has_error(row) then
             file.open(get_file_path(row))
             return true
         end
@@ -147,7 +147,7 @@ local function go_to_first_error_from_current_cursor_position()
     local content = api.nvim_buf_get_lines(0, buffer.get_cursor_row_position(), buffer.last_line, false)
 
     for _, row in ipairs(content) do
-        if row_has_error(row) then
+        if has_error(row) then
             file.open(get_file_path(row))
             return true
         end
