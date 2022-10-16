@@ -2,6 +2,12 @@
 
 A plugin for Neovim allowing to jump to files that contain errors according to the terminal.
 
+## Table of Contents
+1. [Installation](#installation)
+2. [Supported project types](#supported-project-types)
+3. [Commands](#commands)
+4. [Example configuration](#example-configuration)
+
 # Installation
 
 This plugin has been tested with Neovim v0.9.0-dev-71-gd9a80b8e2.
