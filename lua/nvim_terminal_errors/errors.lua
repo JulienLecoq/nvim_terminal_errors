@@ -15,7 +15,25 @@ function M.print_no_error_found()
     print("No error found")
 end
 
-function M.go_to_previous_error_file_from_current_cursor_position(last_failed_statement_row)
+function M.terminal_buffer_id()
+    if buffer.is_terminal_buffer(buffer.current_buffer) then
+        return buffer.current_buffer
+    end
+
+    for _, buffer_id in ipairs(vim.api.nvim_list_bufs()) do
+        if buffer.is_terminal_buffer(buffer_id) then
+            return buffer_id
+        end
+    end
+
+    return nil
+end
+
+function M.go_to_previous_error_file_from_current_cursor_position(buffer_id, last_failed_statement_row)
+    if buffer_id ~= buffer.current_buffer then
+        return M.go_to_previous_error_file_from_last_buffer_line(buffer_id)
+    end
+
     last_failed_statement_row = last_failed_statement_row or builds.last_failed_build_statement_row()
     if last_failed_statement_row == nil then
         return false
@@ -26,7 +44,7 @@ function M.go_to_previous_error_file_from_current_cursor_position(last_failed_st
         return false
     end
 
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, last_failed_statement_row, last_line, false)
+    local content = api.nvim_buf_get_lines(buffer_id, last_failed_statement_row, last_line, false)
 
     for _, row in table_util.rpairs(content) do
         if build_row.has_error(row) then
@@ -38,13 +56,13 @@ function M.go_to_previous_error_file_from_current_cursor_position(last_failed_st
     return false
 end
 
-function M.go_to_previous_error_file_from_last_buffer_line(last_failed_statement_row)
-    last_failed_statement_row = last_failed_statement_row or builds.last_failed_build_statement_row()
+function M.go_to_previous_error_file_from_last_buffer_line(buffer_id, last_failed_statement_row)
+    last_failed_statement_row = last_failed_statement_row or builds.last_failed_build_statement_row(buffer_id)
     if last_failed_statement_row == nil then
         return false
     end
 
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, last_failed_statement_row, buffer.last_line,
+    local content = api.nvim_buf_get_lines(buffer_id, last_failed_statement_row, buffer.last_line,
         false)
 
     for _, row in table_util.rpairs(content) do
@@ -57,13 +75,13 @@ function M.go_to_previous_error_file_from_last_buffer_line(last_failed_statement
     return false
 end
 
-function M.go_to_next_error_file_from_last_failed_statement()
-    local last_failed_statement_row = builds.last_failed_build_statement_row()
+function M.go_to_next_error_file_from_last_failed_statement(buffer_id)
+    local last_failed_statement_row = builds.last_failed_build_statement_row(buffer_id)
     if last_failed_statement_row == nil then
         return false
     end
 
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, last_failed_statement_row, buffer.last_line,
+    local content = api.nvim_buf_get_lines(buffer_id, last_failed_statement_row, buffer.last_line,
         false)
 
     for _, row in ipairs(content) do
@@ -76,13 +94,17 @@ function M.go_to_next_error_file_from_last_failed_statement()
     return false
 end
 
-function M.go_to_next_error_file_from_current_cursor_position()
+function M.go_to_next_error_file_from_current_cursor_position(buffer_id)
+    if buffer_id ~= buffer.current_buffer then
+        return M.go_to_next_error_file_from_last_failed_statement(buffer_id)
+    end
+
     local current_pos = buffer.get_cursor_row_position()
     if current_pos < builds.last_failed_build_statement_row() then
         return false
     end
 
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, buffer.get_cursor_row_position(), buffer.last_line,
+    local content = api.nvim_buf_get_lines(buffer_id, buffer.get_cursor_row_position(), buffer.last_line,
         false)
 
     for _, row in ipairs(content) do
@@ -95,17 +117,17 @@ function M.go_to_next_error_file_from_current_cursor_position()
     return false
 end
 
-function M.get_list_of_errors(opts)
-    if builds.is_last_build_successful() then
+function M.get_list_of_errors(buffer_id, opts)
+    if builds.is_last_build_successful(buffer_id) then
         return M.print_no_error_found()
     end
 
-    local last_failed_statement_row = builds.last_failed_build_statement_row()
+    local last_failed_statement_row = builds.last_failed_build_statement_row(buffer_id)
     if last_failed_statement_row == nil then
         return M.print_no_error_found()
     end
 
-    local content = vim.api.nvim_buf_get_lines(buffer.current_buffer, last_failed_statement_row, buffer.last_line, false)
+    local content = vim.api.nvim_buf_get_lines(buffer_id, last_failed_statement_row, buffer.last_line, false)
     local finderRes = {}
 
     for _, row in ipairs(content) do

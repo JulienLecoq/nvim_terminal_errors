@@ -5,8 +5,8 @@ local api = vim.api
 
 local M = {}
 
-function M.is_last_build_successful()
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, buffer.first_line, buffer.last_line, false)
+function M.is_last_build_successful(buffer_id)
+    local content = api.nvim_buf_get_lines(buffer_id, buffer.first_line, buffer.last_line, false)
 
     for _, row in table_util.rpairs(content) do
         if build_row.has_failed_build_statement(row) then
@@ -21,8 +21,8 @@ function M.is_last_build_successful()
     return true
 end
 
-function M.last_failed_build_statement_row()
-    local content = api.nvim_buf_get_lines(buffer.current_buffer, buffer.first_line, buffer.last_line, false)
+function M.last_failed_build_statement_row(buffer_id)
+    local content = api.nvim_buf_get_lines(buffer_id or buffer.current_buffer, buffer.first_line, buffer.last_line, false)
 
     for index, row in table_util.rpairs(content) do
         if build_row.has_failed_build_statement(row) then

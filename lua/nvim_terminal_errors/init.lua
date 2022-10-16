@@ -11,41 +11,60 @@ function M.setup()
 end
 
 function M.go_to_next_error_file()
-    if builds.is_last_build_successful() then
+    local buffer_id = errors.terminal_buffer_id()
+
+    if buffer_id == nil then
         return errors.print_no_error_found()
     end
 
-    local hasFoundError1 = errors.go_to_next_error_file_from_current_cursor_position()
+    if builds.is_last_build_successful(buffer_id) then
+        return errors.print_no_error_found()
+    end
+
+    local hasFoundError1 = errors.go_to_next_error_file_from_current_cursor_position(buffer_id)
     if hasFoundError1 then
         return
     end
 
-    local hasFoundError2 = errors.go_to_next_error_file_from_last_failed_statement()
+    local hasFoundError2 = errors.go_to_next_error_file_from_last_failed_statement(buffer_id)
     if not hasFoundError2 then
         errors.print_no_error_found()
     end
 end
 
 function M.go_to_previous_error_file()
-    if builds.is_last_build_successful() then
+    local buffer_id = errors.terminal_buffer_id()
+
+    if buffer_id == nil then
         return errors.print_no_error_found()
     end
 
-    local last_failed_statement_row = builds.last_failed_build_statement_row()
+    if builds.is_last_build_successful(buffer_id) then
+        return errors.print_no_error_found()
+    end
 
-    local hasFoundError1 = errors.go_to_previous_error_file_from_current_cursor_position(last_failed_statement_row)
+    local last_failed_statement_row = builds.last_failed_build_statement_row(buffer_id)
+
+    local hasFoundError1 = errors.go_to_previous_error_file_from_current_cursor_position(buffer_id,
+        last_failed_statement_row)
     if hasFoundError1 then
         return
     end
 
-    local hasFoundError2 = errors.go_to_previous_error_file_from_last_buffer_line(last_failed_statement_row)
+    local hasFoundError2 = errors.go_to_previous_error_file_from_last_buffer_line(buffer_id, last_failed_statement_row)
     if not hasFoundError2 then
         errors.print_no_error_found()
     end
 end
 
 function M.list_errors(opts)
-    errors.get_list_of_errors(opts or {})
+    local buffer_id = errors.terminal_buffer_id()
+
+    if buffer_id == nil then
+        return errors.print_no_error_found()
+    end
+
+    errors.get_list_of_errors(buffer_id, opts or {})
 end
 
 return M
