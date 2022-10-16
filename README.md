@@ -6,7 +6,7 @@ A plugin for Neovim allowing to jump to files that contain errors according to t
 
 This plugin has been tested with Neovim v0.9.0-dev-71-gd9a80b8e2.
 
-Using packer:
+Using [packer](https://github.com/wbthomason/packer.nvim):
 
 ```lua
 return require("packer").startup(function(use)
