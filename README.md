@@ -50,9 +50,9 @@ vim.api.nvim_set_keymap("n", "<leader>ef", '<cmd>ListErrorsFromTerminal<cr>', op
 
 The list of projects that are supported by this plugin:
 
-| project types | Go to next error file | Go to previous error file | List errors |
-|:-------------:|:---------------------:|:-------------------------:|:-----------:|
-|    angular    |          Yes          |            Yes            |     Yes     |
+|   project types    | Go to next error file | Go to previous error file | List errors |
+|:------------------:|:---------------------:|:-------------------------:|:-----------:|
+| Ionic with Angular |          Yes          |            Yes            |     Yes     |
 
 # Commands
 

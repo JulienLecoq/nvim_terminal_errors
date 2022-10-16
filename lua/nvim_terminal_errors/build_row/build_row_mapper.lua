@@ -1,13 +1,14 @@
-local angular = require('nvim_terminal_errors.build_row.specific..angular')
+-- local angular = require('nvim_terminal_errors.build_row.specific..angular')
+local ionicAngular = require('nvim_terminal_errors.build_row.specific..angular')
 
 local M = {}
 
-local angularType = 0
+local ionicAngularType = 0
 
-M.defaultType = angularType
+M.defaultType = ionicAngularType
 
 M.implementations = {
-    [angularType] = angular
+    [ionicAngularType] = ionicAngular
 }
 
 return M
