@@ -22,4 +22,29 @@ function M.get_file_path(row)
     return string_util.split(row)[3]
 end
 
+function M.error_detail(row)
+    local row_parts = string_util.split(row)
+
+    local error_parts = {
+        unpack(row_parts, 7)
+    }
+    local error_message = table.concat(error_parts, " ")
+
+    local path = row_parts[3]
+    local path_parts = string_util.split(path, ":")
+    local relative_path = path_parts[1]
+
+    return {
+        file = {
+            relative_path = relative_path,
+            absolute_path = vim.fn.getcwd() .. "/" .. relative_path,
+        },
+        position = {
+            line_number = tonumber(path_parts[2]),
+            col_number = tonumber(path_parts[3])
+        },
+        message = error_message
+    }
+end
+
 return M
