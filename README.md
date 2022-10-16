@@ -23,7 +23,7 @@ end)
 
 # Supported project types 
 
-The list of projects that are supported by this plugin.
+The list of projects that are supported by this plugin:
 
 | project types | Go to next error file | Go to previous error file | List errors |
 |:-------------:|:---------------------:|:-------------------------:|:-----------:|
